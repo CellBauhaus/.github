@@ -1,0 +1,107 @@
+name: CI-python
+env:
+  PIXI_VERSION: "v0.44.0"
+on:
+  push:
+  schedule:
+    # Note: schedule only runs on default branch
+    - cron: '0 18 * * *'  # Daily at 6 PM UTC (~4AM Melbourne, ~2am WA)
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+jobs:
+  test:
+    name: pytest ${{ matrix.os }} - ${{ github.event_name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    permissions: {actions: write, contents: read}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: {lfs: 'true'}
+      - name: Cache Equilibrator
+        id: cache-equilibrator
+        uses: actions/cache@v4
+        with:
+          path: '/home/runner/.cache/equilibrator'
+          key: ${{ runner.os }}-equilibrator
+      - name: Test step
+        uses: "prefix-dev/setup-pixi@v0.8.4"
+        with:
+          pixi-version: ${{ env.PIXI_VERSION }}
+          cache: true
+          auth-host: prefix.dev
+          auth-token: ${{ secrets.PREFIX_API_KEY }}
+          frozen: true
+          environments: >-
+            test-published
+      - run: pixi run -e test-published pytest tests/
+  lint:
+    name: lint - ${{ github.event_name }}
+    runs-on: ubuntu-latest
+    strategy: {fail-fast: false}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: {lfs: 'true'}
+      - name: Test step
+        uses: "prefix-dev/setup-pixi@v0.8.4"
+        with:
+          pixi-version: ${{ env.PIXI_VERSION }}
+          cache: true
+          auth-host: prefix.dev
+          auth-token: ${{ secrets.PREFIX_API_KEY }}
+          frozen: true
+          environments: >-
+            test-published
+      - run: pixi run -e test-published ruff check src/python
+  typecheck:
+    name: typecheck - ${{ github.event_name }}
+    runs-on: ubuntu-latest
+    strategy: {fail-fast: false}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: {lfs: 'true'}
+      - name: Test step
+        uses: "prefix-dev/setup-pixi@v0.8.4"
+        with:
+          pixi-version: ${{ env.PIXI_VERSION }}
+          cache: true
+          auth-host: prefix.dev
+          auth-token: ${{ secrets.PREFIX_API_KEY }}
+          frozen: true
+          environments: >-
+            test-published
+      - run: pixi run -e test-published mypy src/python
+  notify:
+    name: slack notification - ${{ github.event_name }}
+    runs-on: ubuntu-latest
+    needs: [test, lint, typecheck]
+    # This only runs if above failed and we are running a scheduled job (which implies also are on main branch)
+    if: ${{ failure() && github.event_name == 'schedule' }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_COLOR: failure
+        SLACK_USERNAME: "Nightly CI"
+        SLACKIFY_MARKDOWN: true
+        SLACK_MESSAGE: "[${{ github.repository }}](${{ github.server_url }}/${{ github.repository }})\n
+          test: _${{ needs.test.result }}_,
+          lint: _${{ needs.lint.result }}_,
+          typecheck: _${{ needs.typecheck.result }}_,
+        "
+        SLACK_ICON_EMOJI: ":sleeping:"
+        SLACK_FOOTER: ""
+        MSG_MINIMAL: true
+        SLACK_TITLE: "CI Failure"
+        ENABLE_ESCAPES: true
