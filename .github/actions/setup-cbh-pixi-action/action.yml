@@ -1,0 +1,30 @@
+name: "Setup CBH Pixi"
+
+inputs:
+  pixi-version:
+    description: "Pixi version"
+    default: "v0.44.0"
+    required: false
+    type: string
+  enviroment:
+    description: "Which pixi enviroment to install"
+    default: "test-published"
+    required: false
+    type: string
+  auth-token:
+    description: "Prefix.dev API Key"
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - id: setup_pixi
+      uses: prefix-dev/setup-pixi@v0.8.4
+      with:
+        pixi-version: ${{ inputs.pixi-version }}
+        cache: true
+        auth-host: prefix.dev
+        auth-token: ${{ inputs.auth-token}}
+        frozen: true
+        environments: ${{ inputs.enviroment }}
