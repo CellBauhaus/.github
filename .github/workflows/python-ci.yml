@@ -32,7 +32,7 @@ jobs:
         with:
           path: '/home/runner/.cache/${{ inputs.cache-dir }}'
           key: ${{ runner.os }}-${{ inputs.cache-dir }}
-      - uses: ./.github/actions/setup-cbh-pixi
+      - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}}
       - run: pixi run -e test-published pytest tests/
@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {lfs: 'true'}
-      - uses: ./.github/actions/setup-cbh-pixi
+      - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}}
       - run: pixi run -e test-published ruff check src/python
@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {lfs: 'true'}
-      - uses: ./.github/actions/setup-cbh-pixi
+      - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}}
       - run: pixi run -e test-published mypy src/python
