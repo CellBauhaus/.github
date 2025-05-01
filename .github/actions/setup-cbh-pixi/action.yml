@@ -25,6 +25,6 @@ runs:
         pixi-version: ${{ inputs.pixi-version }}
         cache: true
         auth-host: prefix.dev
-        auth-token: ${{ inputs.auth-token}}
+        auth-token: ${{ inputs.auth-token }}
         frozen: true
         environments: ${{ inputs.enviroment }}
