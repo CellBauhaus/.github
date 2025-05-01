@@ -50,7 +50,7 @@ jobs:
         with: {lfs: 'true'}
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
-          auth-token: ${{ secrets.PREFIX_API_KEY }}}
+          auth-token: ${{ secrets.PREFIX_API_KEY }}
       - run: pixi run -e test-published ruff check ${{ inputs.src-dir }}
   typecheck:
     name: typecheck - ${{ github.event_name }}
@@ -61,7 +61,7 @@ jobs:
         with: {lfs: 'true'}
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
-          auth-token: ${{ secrets.PREFIX_API_KEY }}}
+          auth-token: ${{ secrets.PREFIX_API_KEY }}
       - run: pixi run -e test-published mypy ${{ inputs.src-dir }}
   notify:
     name: slack notification - ${{ github.event_name }}
