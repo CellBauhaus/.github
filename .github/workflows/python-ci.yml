@@ -40,7 +40,7 @@ jobs:
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}
-      - run: pixi run -e test-published pytest tests/
+      - run: pixi run -e test-published --frozen pytest tests/
   lint:
     name: lint - ${{ github.event_name }}
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}
-      - run: pixi run -e test-published ruff check ${{ inputs.src-dir }}
+      - run: pixi run -e test-published --frozen ruff check ${{ inputs.src-dir }}
   typecheck:
     name: typecheck - ${{ github.event_name }}
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}
-      - run: pixi run -e test-published mypy ${{ inputs.src-dir }}
+      - run: pixi run -e test-published --frozen mypy ${{ inputs.src-dir }}
   notify:
     name: slack notification - ${{ github.event_name }}
     runs-on: ubuntu-latest
