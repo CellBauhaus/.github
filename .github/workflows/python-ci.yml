@@ -39,7 +39,7 @@ jobs:
           key: ${{ runner.os }}-${{ inputs.cache-dir }}
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
-          auth-token: ${{ secrets.PREFIX_API_KEY }}}
+          auth-token: ${{ secrets.PREFIX_API_KEY }}
       - run: pixi run -e test-published pytest tests/
   lint:
     name: lint - ${{ github.event_name }}
