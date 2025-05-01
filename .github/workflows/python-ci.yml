@@ -6,6 +6,11 @@ on:
         description: 'A subdirectory of .cache to cache'
         required: false
         type: string
+      src-dir:
+        description: 'The directory containing the python source code'
+        required: false
+        default: "src"
+        type: string
 
 concurrency:
   # Skip intermediate builds: always.
@@ -46,7 +51,7 @@ jobs:
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}}
-      - run: pixi run -e test-published ruff check src/python
+      - run: pixi run -e test-published ruff check ${{ inputs.src-dir }}
   typecheck:
     name: typecheck - ${{ github.event_name }}
     runs-on: ubuntu-latest
@@ -57,7 +62,7 @@ jobs:
       - uses:  CellBauhaus/.github/.github/actions/setup-cbh-pixi@main
         with:
           auth-token: ${{ secrets.PREFIX_API_KEY }}}
-      - run: pixi run -e test-published mypy src/python
+      - run: pixi run -e test-published mypy ${{ inputs.src-dir }}
   notify:
     name: slack notification - ${{ github.event_name }}
     runs-on: ubuntu-latest
