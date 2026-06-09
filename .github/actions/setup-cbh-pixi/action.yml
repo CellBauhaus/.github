@@ -11,11 +11,6 @@ inputs:
     default: "test-published"
     required: false
     type: string
-  auth-token:
-    description: "Prefix.dev API Key. If empty, pixi authentication is skipped."
-    required: false
-    default: ""
-    type: string
 
 runs:
   using: "composite"
@@ -25,7 +20,5 @@ runs:
       with:
         pixi-version: ${{ inputs.pixi-version }}
         cache: true
-        auth-host: ${{ inputs.auth-token != '' && 'prefix.dev' || '' }}
-        auth-token: ${{ inputs.auth-token }}
         frozen: true
         environments: ${{ inputs.enviroment }}
